@@ -1,8 +1,27 @@
 <html>
     <head>
-        <title>Testing External Live Agent</title>
+        <title>External Live Agent</title>
     </head>
     <body>
-        Body index 
+        <script type='text/javascript'>
+            function initEmbeddedMessaging() {
+                try {
+                    embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+        
+                    embeddedservice_bootstrap.init(
+                        '00D5j000001toTC',
+                        'Youtube_Demo',
+                        'https://sunil-sharma-dev-ed.my.site.com/ESWYoutubeDemo1734888540538',
+                        {
+                            scrt2URL: 'https://sunil-sharma-dev-ed.my.salesforce-scrt.com'
+                        }
+                    );
+                } catch (err) {
+                    console.error('Error loading Embedded Messaging: ', err);
+                }
+            };
+        </script>
+        <script type='text/javascript' src='https://sunil-sharma-dev-ed.my.site.com/ESWYoutubeDemo1734888540538/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+        
     </body>
 </html>
