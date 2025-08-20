@@ -1,0 +1,100 @@
+public class FormulaCustomClass implements Callable {
+    public Object call(String action, Map<String, Object> args) {
+        System.debug('Arguments '+JSON.serialize(args));
+        
+         Map<String, Object> input = (Map<String, Object>)args.get('input');
+        Map<String, Object> output = (Map<String, Object>)args.get('output');
+        Map<String, Object> options = (Map<String, Object>)args.get('options');
+        
+        if(action == 'insertNode'){
+           List<Map<String,Object>> outputList = new List<Map<String,Object>>();
+           List<Object> arguments = (List<Object>) input.get('arguments');
+           Map<String, Object> inputlistsMap = (Map<String, Object>) arguments[0]; 
+           List<Map<String,Object>> listofElements = (List<Map<String,Object>>) inputlistsMap.get('VLOCITY-FORMULA-LIST');
+           
+           String nodeName = (String) arguments[1];
+           String nodeComparasionKey = (String) arguments[2];
+           String nodeComparasionValue = (String) arguments[3];
+           
+           
+           for(Map<String,Object> inputlist : listofElements){
+               Map<String,Object > deserializeData = inputlist;
+               System.debug('Key '+nodeComparasionKey);
+               String mapKeyValue = (String) deserializeData.get(nodeComparasionKey);
+               System.debug('Inside if key '+mapKeyValue+' nodeComparasionValue '+nodeComparasionValue);
+               if(mapKeyValue == nodeComparasionValue){
+                   System.debug('Inside if');
+                   deserializeData.put(nodeName,'true');
+               } else{
+                   deserializeData.put(nodeName,'false');
+               }
+              outputList.add(deserializeData); 
+           }
+           System.debug('Outout '+JSON.serialize(outputList));
+           output.put('result',outputList);
+       }
+        else if(action == 'serialize'){
+             List<Map<String,Object>> listData = (List<Map<String,Object>>)input.get('input');
+           Map<String,Object> firstIndex = listData[0];
+           Set<String> columnsArray = firstIndex.keySet();
+           String csvData = '';
+           for(String column : columnsArray){
+               csvData = csvData+(String.isBlank(csvData)?column:','+column);
+           }
+           csvData=csvData+'\r';
+           for(Integer i=0;i<listData.size();i++){
+               Map<String,Object> data = listData[i];
+               String rowData = '';
+               for(String column : columnsArray){
+                    rowData = rowData+(String.isBlank(rowData)?(String)data.get(column):','+(String)data.get(column));
+               }
+              csvData=csvData+rowData+'\r'; 
+           }
+           output.put('output', csvData); // JSON String
+        }
+        else if(action == 'deserialize'){
+            Object data = input.get('input');
+   
+   
+           if (data != null && data InstanceOf String)
+               {
+                   List<String> valueSet = ((String)data).split('\n');
+                   List<Map<String, String>> csvList = new List<Map<String, String>>();
+                   List<String> columns = new List<String>();
+                   for (Integer i = 0; i < valueSet.size(); i++)
+                   {
+                       String value = valueSet[i];
+                       if (String.isBlank(value))
+                       {
+                           continue;
+                       }
+                       if (i == 0)
+                       {
+                           List<String> valSet = value.split(',');
+                           for (Integer y = 0; y < valSet.size(); y++)
+                           {
+                               columns.add(valSet[y]);
+                           }
+                       }
+                       else
+                       {
+                           List<String> valSet = value.split(',');
+                           if (columns.size() >= valSet.size())
+                           {
+                               Map<String, String> rows = new Map<String, String>();
+                               for (Integer z = 0; z < valSet.size(); z++)
+                               {
+                                   rows.put(columns[z], valSet[z]);
+                               }
+                               csvList.add(rows);
+                           }
+                       }
+                   }
+                   output.put('output', csvList);
+                   System.debug(output);
+                   return true;
+               }	
+        } 
+        return null;
+    }
+}
