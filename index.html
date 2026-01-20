@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>External Live Agent1</title>
+        <title>External Live Agent</title>
 		
 		<style>
 	/* Added to increase height and ensure z-index of chat window is infront / greater than Header */
@@ -238,42 +238,13 @@
 		<div class="container-header">
 			<div>
 				<div style="display: flex; gap:10px">
-					<img src="https://help-dev.aarp.org/resource/1738759575000/AARP_A_Logo?" alt="AARP Logo" width="36" height="36" />
 					<h1 class="aarp-heading">Chat Ended</h1>
 				</div>
-			</div>
-			<div>
-				<button class="close" aria-label="Dismiss alert" type="button" onClick="hidePostchat()" style="background: none;border: none;color: white;size: inherit;margin-right: 4%;">
-					<svg width="24" height="24" viewBox="0 0 520 520" aria-hidden="true" focusable="false">
-						<path d="M310 254l130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 01-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0114 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 010-14z" fill="white"></path>
-					</svg>
-				</button>
 			</div>
 		</div>
 	</header>
 
 	<div style="Padding-top:1rem; font-size: 18px; Padding-left:15px; padding-right: 15px;">
-		<div style="text-align: center;padding-bottom: 2rem;">
-			<img src="https://help-dev.aarp.org/resource/1646641167000/CCare_AARPLogo?" alt="AARP Logo" width="250" height="60" />
-		</div>
-		<div id="unregistered">
-			<div class="ccare-post-chat">
-				<p>Unlock all that AARP has to offer by creating a login on aarp.org.</p>
-			</div>
-			<ul style="font-size: 16px; font-family: 'Lato',sans-serif; line-height: 24px;">
-				<li>Article, Games, Advice and more, tailored to your tastes</li>
-				<li>Attend online and in-person events.</li>
-				<li>Earn points through AARP rewards.</li>
-				<li>And more.</li>
-			</ul>
-			<div class="ccare-post-chat">
-				<p>AARP membership is not required and it’s 100% free. It only takes moment, register today.</p>
-			</div>
-			<div style="display: flex;    flex-direction: column;    align-items: center;">
-				<button type="button" class="search-Btn" onClick="RegistrationPage()">Create Login</button>
-				<button type="button" class="search-Btn" onClick="downloadChatTranscript()">Download Chat Transcript</button>
-			</div>
-		</div>
 		<div id="registered" class="ccare-post-chat">
 			<p>
 				Thank you for chatting with us. If you’d like to keep a record of our conversation, you can download your chat transcript below.
@@ -289,10 +260,18 @@
 		container.innerHTML = postChatHTML;
 		document.body.appendChild(container);
 
-
+window.addEventListener("onEmbeddedMessagingConversationClosed", (event) => {
+			const postchat = document.getElementById("postchat");
+			
+			postchat.style.display = "inline-block";
+			
+			const registeredDiv = document.getElementById("registered");
+			registeredDiv.style.display = "inline-block";
+	
+		});
 function downloadChatTranscript() {
-			const iframeElem = document.getElementById("#embeddedMessagingFrame");
-			iframeElem.contentWindow.postMessage({ "eventName": "downloadTranscript" }, iframeElem.src);
+			const iframeElem = document.getElementById("embeddedMessagingFrame");
+			iframeElem.contentWindow.postMessage({ "eventName": "downloadTranscript","Data":"Data Received from Script" }, iframeElem.src);
 		}
 		
 					
