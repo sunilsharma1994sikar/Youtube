@@ -1,36 +1,320 @@
 <html>
     <head>
-        <title>External Live Agent</title>
+        <title>External Live Agent1</title>
+		
+		<style>
+	/* Added to increase height and ensure z-index of chat window is infront / greater than Header */
+	.embeddedMessagingFrame.eswIsDesktop.isMaximized {
+		height: 97% !important;
+		max-height: 1000px !important;
+	}
+
+	.embeddedMessagingFrame,
+	.embeddedMessagingConversationButtonWrapper {
+		z-index: 1200 !important;
+	}
+
+	/* Added as part of SCMTP-12658 To match chat icon to original help center icon */
+	.embeddedMessagingConversationButtonWrapper button.embeddedMessagingConversationButton {
+		width: 70px;
+		height: 70px;
+		background-image: url(https://aarpconsumercare--dev32.sandbox.my.site.com/resource/AARP_Chat_Button?);
+		background-size: contain;
+	}
+
+	.embeddedMessagingConversationButton:focus {
+		box-shadow: 2px 2px 5px 0 rgba(45, 45, 45, 0.5);
+	}
+
+	.embeddedMessagingConversationButtonWrapper .embeddedMessagingConversationButton div[class="embeddedMessagingIconContainer"]>svg.embeddedMessagingIconChat {
+		display: none;
+	}
+
+	.minimizedButton div[class="minimizedButtonIconContainer"]>svg.minimizedButtonIconChat {
+		display: none;
+	}
+
+	/* Aligns spinner to new larger chat button */
+	.embeddedMessagingLoadingSpinner {
+		background-color: #CB2B19;
+		display: inline-grid;
+		margin: 0 !important;
+		align-items: center;
+		justify-items: center;
+	}
+
+	.embeddedMessagingLoadingCircle {
+		width: 50px !important;
+		height: 50px !important;
+	}
+
+	.embedded-messaging>.embeddedMessagingFrame[class~="isMinimized"]#embeddedMessagingFrame {
+		height: max-content;
+		width: max-content;
+		border-radius: unset;
+	}
+
+	/* SCMTP-12658 Ends */
+	/* SCMTP-13405 Starts */
+	.embeddedMessagingConversationButtonWrapper .embeddedMessagingConversationButton:not(.no-hover):hover {
+		background-color: none;
+		background-image: url(https://aarpconsumercare--ccaredev.sandbox.my.site.com/resource/AARP_Chat_Button?);
+		opacity: 0.6;
+		background-size: contain;
+	}
+
+	.embeddedMessagingConversationButtonWrapper .embeddedMessagingConversationButton[class~="embeddedMessagingConversationButtonLoading"] {
+		background-image: none !important;
+	}
+
+	.embeddedMessagingConversationButton:focus {
+		outline: rgb(77, 154, 254) solid !important;
+	}
+
+	button#embeddedMessagingConversationButton:focus::before {
+		border: none;
+	}
+
+	iframe#embeddedMessagingFrame:focus-within {
+		outline: rgb(77, 154, 254) solid !important;
+		outline-offset: 2px;
+	}
+
+	.search-container {
+		background-color: white;
+		width: 28%;
+		height: 95%;
+		margin-right: 0.3%;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		border: 1px;
+		margin-top: 2rem;
+		z-index: 9999;
+		position: fixed;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		display: none;
+		bottom: 0;
+		right: 30px;
+		margin: 0;
+		visibility: visible;
+		max-height: calc(100vh - 9em);
+		max-width: calc(100vw - 9em);
+		min-width: 80px;
+		min-height: 120px;
+		width: var(--eswWidth, 320px);
+		height: var(--eswHeight, 480px);
+		height: 97% !important;
+		max-height: 1000px !important;
+	}
+
+	div#registered,
+	div#unregistered {
+		display: none;
+	}
+
+	.search-input {
+		width: 83%;
+		margin-top: -8px;
+		padding: 10px;
+		padding-right: 44px;
+		margin-left: 100px;
+		font-size: 14px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		border-color: #c23934;
+		outline: none;
+	}
+
+	.container-header {
+		background-color: #c23934;
+		height: 3.3rem;
+		border-top-left-radius: 10px;
+		border-top-right-radius: 10px;
+		padding: 0px 14px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.aarp-heading {
+		padding-top: 2%;
+		font-size: 18px;
+		color: white;
+		font-family: Lato, sans-serif;
+		margin: 0;
+		align-self: center;
+		flex-grow: 1;
+		text-align: left;
+		vertical-align: middle;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: inherit;
+		font-weight: normal;
+		letter-spacing: 0.025em;
+	}
+
+	.ccare-post-chat-error {
+		margin-top: 15px;
+		margin-bottom: 25px;
+		color: rgb(194, 57, 52);
+		font-size: .75rem;
+		width: 265px;
+		display: none;
+		text-align: center;
+	}
+
+	.ccare-post-chat {
+		text-align: center;
+		font-family: "Lato", sans-serif;
+		font-size: 16px !important;
+		color: black;
+		line-height: 1.5;
+	}
+
+	.ccare-post-chat-input {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 265px;
+		height: 30px;
+		margin: 0 auto;
+		margin-top: 15px;
+	}
+
+	.ccare-post-chat-input:disabled {
+		border-color: rgba(118, 118, 118, 0.3);
+		cursor: default;
+		background-color: light-dark(rgba(239, 239, 239, 0.3), rgba(59, 59, 59, 0.3));
+		color: light-dark(rgb(84, 84, 84), rgb(170, 170, 170));
+	}
+
+	.search-Btn {
+		background-color: #fbc743;
+		width: 270px;
+		height: 30px;
+		color: #000;
+		font-weight: bold;
+		display: block;
+		margin: 0 auto;
+		margin-top: 20px;
+		line-height: 1;
+		border: 1px solid #747474;
+		font-size: 16px;
+		font-family: "Lato", sans-serif;
+	}
+
+	@media only screen and (min-width: 15em) and (max-width:47.9375em) {
+		.search-container {
+			bottom: 0;
+			right: 0;
+			margin: 16px;
+			width: var(--eswWidth, 320px);
+			height: var(--eswHeight, 480px);
+			height: 100vh;
+			width: 100vw;
+			max-height: calc(100vh - 9em);
+			max-width: calc(100vw - 2em);
+			min-width: 80px;
+			min-height: 120px;
+			visibility: visible
+		}
+	}
+
+	button#embeddedMessagingConversationButton:hover {
+		filter: brightness(0.8);
+	}
+</style>
+
+
+
     </head>
     <body>
-        <script type='text/javascript'>
-            window.addEventListener("onEmbeddedMessagingReady", () => {
-  console.log("Received the onEmbeddedMessagingReady event…");
+      <script type='text/javascript'>
+	  
+	  const postChatHTML = `<div id="postchat" class="search-container">
 
-  embeddedservice_bootstrap.autoResponseAPI.setAutoResponseParameters({
-    Language: "en_US"
-  });
-});
+	<header>
+		<div class="container-header">
+			<div>
+				<div style="display: flex; gap:10px">
+					<img src="https://help-dev.aarp.org/resource/1738759575000/AARP_A_Logo?" alt="AARP Logo" width="36" height="36" />
+					<h1 class="aarp-heading">Chat Ended</h1>
+				</div>
+			</div>
+			<div>
+				<button class="close" aria-label="Dismiss alert" type="button" onClick="hidePostchat()" style="background: none;border: none;color: white;size: inherit;margin-right: 4%;">
+					<svg width="24" height="24" viewBox="0 0 520 520" aria-hidden="true" focusable="false">
+						<path d="M310 254l130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 01-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0114 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 010-14z" fill="white"></path>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<div style="Padding-top:1rem; font-size: 18px; Padding-left:15px; padding-right: 15px;">
+		<div style="text-align: center;padding-bottom: 2rem;">
+			<img src="https://help-dev.aarp.org/resource/1646641167000/CCare_AARPLogo?" alt="AARP Logo" width="250" height="60" />
+		</div>
+		<div id="unregistered">
+			<div class="ccare-post-chat">
+				<p>Unlock all that AARP has to offer by creating a login on aarp.org.</p>
+			</div>
+			<ul style="font-size: 16px; font-family: 'Lato',sans-serif; line-height: 24px;">
+				<li>Article, Games, Advice and more, tailored to your tastes</li>
+				<li>Attend online and in-person events.</li>
+				<li>Earn points through AARP rewards.</li>
+				<li>And more.</li>
+			</ul>
+			<div class="ccare-post-chat">
+				<p>AARP membership is not required and it’s 100% free. It only takes moment, register today.</p>
+			</div>
+			<div style="display: flex;    flex-direction: column;    align-items: center;">
+				<button type="button" class="search-Btn" onClick="RegistrationPage()">Create Login</button>
+				<button type="button" class="search-Btn" onClick="downloadChatTranscript()">Download Chat Transcript</button>
+			</div>
+		</div>
+		<div id="registered" class="ccare-post-chat">
+			<p>
+				Thank you for chatting with us. If you’d like to keep a record of our conversation, you can download your chat transcript below.
+			</p>
+			<div style="display: flex;    flex-direction: column;    align-items: center;">
+				<button type="button" class="search-Btn" onClick="downloadChatTranscript()">Download Chat Transcript</button>
+			</div>
+		</div>
+	</div>
+</div>`;
+
+		const container = document.createElement('div');
+		container.innerHTML = postChatHTML;
+		document.body.appendChild(container);
 
 
-            function initEmbeddedMessaging() {
-                try {
-                    embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
-        
-                    embeddedservice_bootstrap.init(
-                        '00D5j000001toTC',
-                        'Youtube_Demo',
-                        'https://sunil-sharma-dev-ed.my.site.com/ESWYoutubeDemo1734888540538',
-                        {
-                            scrt2URL: 'https://sunil-sharma-dev-ed.my.salesforce-scrt.com'
-                        }
-                    );
-                } catch (err) {
-                    console.error('Error loading Embedded Messaging: ', err);
-                }
-            };
-        </script>
-        <script type='text/javascript' src='https://sunil-sharma-dev-ed.my.site.com/ESWYoutubeDemo1734888540538/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+function downloadChatTranscript() {
+			const iframeElem = document.getElementById("#embeddedMessagingFrame");
+			iframeElem.contentWindow.postMessage({ "eventName": "downloadTranscript" }, iframeElem.src);
+		}
+		
+					
+		function initEmbeddedMessaging() {
+			try {
+				embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+
+				embeddedservice_bootstrap.init(
+					'00Dfj00000Fq6AN',
+					'MIAW',
+					'https://orgfarm-f7c0a4b134-dev-ed.develop.my.site.com/ESWMIAW1767338785196',
+					{
+						scrt2URL: 'https://orgfarm-f7c0a4b134-dev-ed.develop.my.salesforce-scrt.com'
+					}
+				);
+			} catch (err) {
+				console.error('Error loading Embedded Messaging: ', err);
+			}
+		};
+</script>
+<script type='text/javascript' src='https://orgfarm-f7c0a4b134-dev-ed.develop.my.site.com/ESWMIAW1767338785196/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
         
     </body>
 </html>
